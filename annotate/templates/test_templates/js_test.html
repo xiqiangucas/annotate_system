@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>js测试和form测试</title>
+    <script src="{% static 'js/laydate/laydate.js' %}"></script>
+    <script>
+        laydate.render({
+          elem: '#dates' //指定元素
+        });
+    </script>
+    <script language="JavaScript" type="text/javascript">
+        function saveRisk(){
+            document.form.submit();
+            window.location="form.html";
+        }
+        function goToNext(){
+            <!--var nextPage="index.html?date="+document.getElementById("dates").value;-->
+            var nextPage="http://home.firefoxchina.cn/";
+            window.location=nextPage;
+        }
+    </script>
+</head>
+
+<body>
+
+    <h3>Date
+        <input type="text" class="demo-input" placeholder="请选择日期" id="dates" name="date">
+        <!--<input id="dates" type="text" name="dates" Width="200px" onclick="setday(this)"/>-->
+        <a onclick="goToNext();"><img src="{% static 'img/search.png' %}" title="Search" width="16" height="16"/></a>
+        <a onclick="saveRisk();"><img src="{% static 'img/save.png' %}" title="Save" width="16" height="16" /></a>
+    </h3>
+
+
+    <h3>{{risk}}</h3>
+    <button onclick="myFunction('risk','CEO')">点击这里</button>
+    <script>
+        function myFunction(name,job)
+        {
+            alert("Welcome " + name + ", the " + job);
+        }
+    </script>
+</body>
+</html>

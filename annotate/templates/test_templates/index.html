@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>标注系统</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/theme.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+    <script src="{% static 'js/laydate/laydate.js' %}"></script>
+    <script>
+        laydate.render({
+          elem: '#dates' //指定元素id
+        });
+    </script>
+    <script language="JavaScript" type="text/javascript">
+       //定义了风险的二维数组，里面的顺序跟风险大类的顺序是相同的。通过selectedIndex获得省份的下标值来得到相应的城市数组
+       var risk=[
+           ["恐怖主义与邪教","台湾问题","政治稳定","国家安全与对外关系","重大活动"],
+           ["金融问题","经济问题"],
+           ["伦理道德","信用与诚信","社会风气与精神文明建设"],
+           ["医疗与疾病","教育","就业","物价上涨","交通问题","食品与药品安全","住房","假冒伪劣"],
+           ["重大传染性疾病","贫富与城乡差距","安全生产","治安犯罪与群体性事件","三农问题"],
+           ["贪污腐败","政府执政能力","社会体制与法制建设","社会福利与保障"],
+           ["自然灾害","人口问题","能源短缺与环境污染"],
+           ["无风险"]
+       ];
+       function getRisk(i){
+
+         //获得风险大类下拉框的对象（其中form为表单名，risk为风险大类下拉列表名称）
+         //var sltRisk=document.form.risk;
+         //var sltRisk=document.getElementByTagNme('risk');
+         //var sltRisk=document.getElementById('myselect1');
+         var str1="myselect"+i;
+         var sltRisk=document.getElementById(str1);
+         //获得风险小类下拉框的对象（其中form为表单名，subrisk为风险大类下拉列表名称）
+         //var sltsubRisk=document.form.subrisk;
+         //var sltsubRisk=document.getElementByTagNme('subrisk');
+         //var sltsubRisk=document.getElementById('myselect2');
+         var j=i+1
+         var str2="myselect"+j
+         //var str2="myselectt"+i
+         var sltsubRisk=document.getElementById(str2);
+         //得到对应风险大类的风险小类数组
+         <!--var subRisk=risk[sltRisk.selectedIndex - 1];-->
+         var subRisk=risk[sltRisk.selectedIndex];
+
+         //清空风险小类下拉框，仅留提示选项
+         sltsubRisk.length=1;
+
+         //将城市数组中的值填充到城市下拉框中
+         for(var i=0;i<subRisk.length;i++){
+           sltsubRisk[i+1]=new Option(subRisk[i],subRisk[i]);
+         }
+       }
+    </script>
+    <script language="JavaScript" type="text/javascript">
+        function saveRisk(){
+            document.form.submit();
+            //window.location="http://127.0.0.1:8000/annotate/hotword_action_page/"+document.getElementById("dates").value;
+            //window.location="http://127.0.0.1:8000/annotate/hotword_action_page/";
+        }
+        function goToNext(){
+            var nextPage="http://127.0.0.1:8000/annotate/hotword_page/"+document.getElementById("dates").value;
+            window.location=nextPage;
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="wrapper">
+            <div id="content">
+                <div id="box">
+                    <h3>Date
+                        <input type="text" class="demo-input" placeholder="{{date_str}}" id="dates" name="date">
+                        <a onclick="goToNext();"><img src="{% static 'img/search.png' %}" title="Search" width="16" height="16"/></a>
+                        <a onclick="saveRisk();"><img src="{% static 'img/save.png' %}" title="Save" width="16" height="16" /></a>
+                    </h3>
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th width="40px"><a href="#">ID</a></th>
+                                <th width="120px"><a href="#">Title</a></th>
+                                <th width="120px"><a href="#">Risk</a></th>
+                                <th width="150px"><a href="#">Subrisk</a></th>
+                                <th width="120px"><a href="#">Type</a></th>
+                            </tr>
+                        </thead>
+                        <form  name="form" action="/annotate/hotword_action_page/"  method="get">
+                            <input type="hidden" name="date_str" value="{{date_str}}"/>
+                            {% for d in hotword_lst %}
+                            <tr>
+                                <td id="id" class="a-center">{{d.id}}</td>
+                                <td><a href="{{d.link}}" target="_blank">{{d.hotword}}</a></td>
+                                {% if d.big_risk == '国家安全' %}
+                                    <td>
+                                        <select id="myselect1" NAME="risk{{d.id}}" onChange="getRisk(1);" >
+                                                <option class=input value="国家安全" selected="selected" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect2" NAME="subrisk{{d.id}}">
+                                                <option class=input value="0" selected="selected">请选择风险小类</option>
+                                                <option class=input value="恐怖主义与邪教" >恐怖主义与邪教</option>
+                                                <option class=input value="台湾问题" >台湾问题</option>
+                                                <option class=input value="政治稳定" >政治稳定</option>
+                                                <option class=input value="国家安全与对外关系" >国家安全与对外关系</option>
+                                                <option class=input value="重大活动" >重大活动</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '金融经济' %}
+                                    <td>
+                                        <select id="myselect3" NAME="risk{{d.id}}" onChange="getRisk(3)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" selected="selected">金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect4" NAME="subrisk{{d.id}}">
+                                                <option class=input value="0" >请选择风险小类</option>
+                                                <option class=input value="金融问题" >金融问题</option>
+                                                <option class=input value="经济问题" >经济问题</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '精神文明' %}
+                                    <td>
+                                        <select id="myselect5" NAME="risk{{d.id}}" onChange="getRisk(5)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" selected="selected">精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect6" NAME="subrisk{{d.id}}">
+                                            <option class=input value="0" >请选择风险小类</option>
+                                            <option class=input value="伦理道德" >伦理道德</option>
+                                            <option class=input value="信用与诚信" >信用与诚信</option>
+                                            <option class=input value="社会风气与精神文明建设" >社会风气与精神文明建设</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '日常生活' %}
+                                    <td>
+                                        <select id="myselect7" NAME="risk{{d.id}}" onChange="getRisk(7)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" selected="selected">日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect8" NAME="subrisk{{d.id}}">
+                                            <option class=input value="0" >请选择风险小类</option>
+                                            <option class=input value="医疗与疾病" >医疗与疾病</option>
+                                            <option class=input value="教育" >教育</option>
+                                            <option class=input value="就业" >就业</option>
+                                            <option class=input value="物价上涨" >物价上涨</option>
+                                            <option class=input value="交通问题" >交通问题</option>
+                                            <option class=input value="食品与药品安全" >食品与药品安全</option>
+                                            <option class=input value="住房" >住房</option>
+                                            <option class=input value="假冒伪劣" >假冒伪劣</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '社会稳定' %}
+                                    <td>
+                                        <select id="myselect9" NAME="risk{{d.id}}" onChange="getRisk(9)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" selected="selected">社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect10" NAME="subrisk{{d.id}}">
+                                            <option class=input value="0" >请选择风险小类</option>
+                                            <option class=input value="重大传染性疾病" >重大传染性疾病</option>
+                                            <option class=input value="贫富与城乡差距" >贫富与城乡差距</option>
+                                            <option class=input value="安全生产" >安全生产</option>
+                                            <option class=input value="治安犯罪与群体性事件" >治安犯罪与群体性事件</option>
+                                            <option class=input value="三农问题" >三农问题</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '政府执政' %}
+                                    <td>
+                                        <select id="myselect11" NAME="risk{{d.id}}" onChange="getRisk(11)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" selected="selected">政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect12" NAME="subrisk{{d.id}}">
+                                            <option class=input value="0" >请选择风险小类</option>
+                                            <option class=input value="贪污腐败" >贪污腐败</option>
+                                            <option class=input value="政府执政能力" >政府执政能力</option>
+                                            <option class=input value="社会体制与法制建设" >社会体制与法制建设</option>
+                                            <option class=input value="社会福利与保障" >社会福利与保障</option>
+                                        </select>
+                                    </td>
+                                {% elif d.big_risk == '资源环境' %}
+                                    <td>
+                                        <select id="myselect13" NAME="risk{{d.id}}" onChange="getRisk(13)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" selected="selected">资源环境</option>
+                                                <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect14" NAME="subrisk{{d.id}}">
+                                            <option class=input value="0" >请选择风险小类</option>
+                                            <option class=input value="自然灾害" >自然灾害</option>
+                                            <option class=input value="人口问题" >人口问题</option>
+                                            <option class=input value="能源短缺与环境污染" >能源短缺与环境污染</option>
+                                        </select>
+                                    </td>
+                                 {% elif d.big_risk == '无风险' %}
+                                    <td>
+                                        <select id="myselect15" NAME="risk{{d.id}}" onChange="getRisk(15)" >
+                                                <option class=input value="国家安全" >国家安全</option>
+                                                <option class=input value="金融经济" >金融经济</option>
+                                                <option class=input value="精神文明" >精神文明</option>
+                                                <option class=input value="日常生活" >日常生活</option>
+                                                <option class=input value="社会稳定" >社会稳定</option>
+                                                <option class=input value="政府执政" >政府执政</option>
+                                                <option class=input value="资源环境" >资源环境</option>
+                                                <option class=input value="无风险" selected="selected">无风险</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="myselect16" NAME="subrisk{{d.id}}">
+                                            <option class=input value="无风险" >无风险</option>
+                                        </select>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </form>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

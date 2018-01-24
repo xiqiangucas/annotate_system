@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>显示字典和列表中的数据</title>
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        function goToNext()
+        {
+	        var nextPage="http://127.0.0.1:8000/annotate/index";
+	        window.location=nextPage;
+	    }
+    </script>
+</head>
+<body>
+    <div id="message">
+         <button type="button" onclick="goToNext();">测试javascript</button>
+    </div>
+    <div id='dict'>
+        站点：{{ dict.site }}
+        <br><br>
+        作者：{{ dict.author }}
+        <br><br>
+        {% for key, value in dict.items %}
+            {{ key }}: {{ value }}
+            <br><br>
+        {% endfor %}
+    </div>
+    <div id="list">
+        <!--{% for e in list%}-->
+            <!--<h1>{{ e }}</h1>-->
+        <!--{% endfor%}-->
+        <h1>{{list.0}}</h1>
+        <h1>{{list|length}}</h1>
+    </div>
+    <div>
+        <table>
+            {% for e in lst%}
+                <tr>
+                    {% for key, value in e.items %}
+                        <!--<td>{{key}}</td>-->
+                        <td>{{value}}</td>
+                    {% endfor%}
+                </tr>
+                <tr>
+                    <td>{{e.author}}</td>
+                    <td>{{e.site}}</td>
+                </tr>
+            {% endfor%}
+        </table>
+    </div>
+</body>
+</html>

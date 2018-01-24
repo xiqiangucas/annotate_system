@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>标注后的结果</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/theme.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+    <script src="{% static 'js/laydate/laydate.js' %}"></script>
+    <script>
+        laydate.render({
+          elem: '#dates' //指定元素id
+        });
+    </script>
+    <script language="JavaScript" type="text/javascript">
+        function goToNext(){
+            var nextPage="http://127.0.0.1:8000/annotate/hotword_page/"+document.getElementById("dates").value;
+            window.location=nextPage;
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="wrapper">
+            <div id="content">
+                <div id="box">
+                    <h3>Date
+                        <input type="text" class="demo-input" placeholder="{{date_str}}" id="dates" name="date">
+                        <a onclick="goToNext();"><img src="{% static 'img/search.png' %}" title="Search" width="16" height="16"/></a>
+                    </h3>
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th width="40px"><a href="#">ID</a></th>
+                                <th width="120px"><a href="#">Title</a></th>
+                                <th width="120px"><a href="#">Risk</a></th>
+                                <th width="150px"><a href="#">Subrisk</a></th>
+                                <th width="120px"><a href="#">Type</a></th>
+                            </tr>
+                        </thead>
+                            {% for d in hotword_lst %}
+                            <tr>
+                                <td id="id" class="a-center">{{d.id}}</td>
+                                <td><a href="{{d.link}}" target="_blank">{{d.hotword}}</a></td>
+                                <td>{{d.big_risk}}</td>
+                                <td>{{d.small_risk}}</td>
+                            </tr>
+                            {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
